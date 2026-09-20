@@ -10,6 +10,9 @@ import re
 from typing import List
 
 
+PII_FIELDS = ("name", "email", "phone", "ssn", "password")
+
+
 def filter_datum(fields: List[str], redaction: str, message: str,
                  separator: str) -> str:
     """Obfuscate the values of specified fields within a log message.
@@ -57,3 +60,23 @@ class RedactingFormatter(logging.Formatter):
         """
         return filter_datum(self.fields, self.REDACTION,
                             super().format(record), self.SEPARATOR)
+
+
+def get_logger() -> logging.Logger:
+    """Create and configure a logger for handling user data.
+
+    Returns:
+        A logging.Logger named "user_data" that logs up to INFO
+        level, does not propagate to other loggers, and uses a
+        StreamHandler with RedactingFormatter (parameterized with
+        PII_FIELDS) to obfuscate sensitive fields in log messages.
+    """
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(RedactingFormatter(PII_FIELDS))
+    logger.addHandler(stream_handler)
+
+    return logger
