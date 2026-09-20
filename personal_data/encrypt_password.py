@@ -18,3 +18,17 @@ def hash_password(password: str) -> bytes:
         suitable for storing in place of the plain-text password.
     """
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+
+def is_valid(hashed_password: bytes, password: str) -> bool:
+    """Check whether a password matches a previously hashed password.
+
+    Args:
+        hashed_password: the bcrypt-hashed password to check against.
+        password: the plain-text password to validate.
+
+    Returns:
+        True if password, once hashed, matches hashed_password,
+        False otherwise.
+    """
+    return bcrypt.checkpw(password.encode(), hashed_password)
