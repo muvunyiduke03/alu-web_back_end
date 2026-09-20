@@ -6,8 +6,11 @@ obfuscating personally identifiable information (PII) fields
 within log messages.
 """
 import logging
+import os
 import re
 from typing import List
+
+import mysql.connector
 
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
@@ -80,3 +83,28 @@ def get_logger() -> logging.Logger:
     logger.addHandler(stream_handler)
 
     return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """Connect to the secure holberton database using env credentials.
+
+    Reads PERSONAL_DATA_DB_USERNAME (default "root"),
+    PERSONAL_DATA_DB_PASSWORD (default ""), PERSONAL_DATA_DB_HOST
+    (default "localhost"), and PERSONAL_DATA_DB_NAME from the
+    environment to avoid hardcoding credentials in the codebase.
+
+    Returns:
+        A MySQLConnection object connected to the configured
+        database.
+    """
+    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME")
+
+    return mysql.connector.connect(
+        user=username,
+        password=password,
+        host=host,
+        database=db_name,
+    )
